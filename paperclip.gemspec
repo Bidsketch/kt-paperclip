@@ -12,9 +12,7 @@ Gem::Specification.new do |s|
   s.description       = "Easy upload management for ActiveRecord"
   s.license           = "MIT"
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {spec,features}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
+  s.files         = `git ls-files lib shoulda_macros`.split($/) + ["LICENSE", "README.md", "UPGRADING"]
   s.require_paths = ["lib"]
 
   s.post_install_message = File.read("UPGRADING") if File.exist?("UPGRADING")
@@ -25,8 +23,8 @@ Gem::Specification.new do |s|
   s.add_dependency("activemodel", ">= 4.2.0")
   s.add_dependency("activesupport", ">= 4.2.0")
   s.add_dependency("mime-types")
-  s.add_dependency("marcel", "~> 1.0.1")
-  s.add_dependency("terrapin", "~> 0.6.0")
+  s.add_dependency("marcel", ">= 1.0.1")
+  s.add_dependency("terrapin", ">= 0.6.0", "< 2.0")
 
   s.add_development_dependency("activerecord", ">= 4.2.0")
   s.add_development_dependency("appraisal")

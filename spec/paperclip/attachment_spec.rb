@@ -1267,7 +1267,7 @@ describe Paperclip::Attachment do
                 @existing_names.each { |f| assert_file_not_exists(f) }
               end
 
-              it "deletes the files when you call #delete" do
+              it "deletes the files when you call #destroy" do
                 expect(@attachment).to receive(:instance_write).with(:file_name, nil)
                 expect(@attachment).to receive(:instance_write).with(:content_type, nil)
                 expect(@attachment).to receive(:instance_write).with(:file_size, nil)
@@ -1275,6 +1275,32 @@ describe Paperclip::Attachment do
                 expect(@attachment).to receive(:instance_write).with(:updated_at, nil)
                 @attachment.destroy
                 @existing_names.each { |f| assert_file_not_exists(f) }
+              end
+
+              it "deletes the files when you destroy the model" do
+                expect(@attachment).to receive(:instance_write).with(:file_name, nil)
+                expect(@attachment).to receive(:instance_write).with(:content_type, nil)
+                expect(@attachment).to receive(:instance_write).with(:file_size, nil)
+                expect(@attachment).to receive(:instance_write).with(:fingerprint, nil)
+                expect(@attachment).to receive(:instance_write).with(:updated_at, nil)
+                @attachment.instance.destroy
+                @existing_names.each { |f| assert_file_not_exists(f) }
+              end
+
+              context "when 'return_file_attributes_on_destroy' option is set to true" do
+                before do
+                  @attachment.options[:return_file_attributes_on_destroy] = true
+                end
+
+                it "does not override attachment-related attributes and deletes the files" do
+                  expect(@attachment).not_to receive(:instance_write)
+                  expect(@attachment).not_to receive(:instance_write)
+                  expect(@attachment).not_to receive(:instance_write)
+                  expect(@attachment).not_to receive(:instance_write)
+                  expect(@attachment).not_to receive(:instance_write)
+                  @attachment.instance.destroy
+                  @existing_names.each { |f| assert_file_not_exists(f) }
+                end
               end
 
               context "when keeping old files" do
@@ -1304,7 +1330,7 @@ describe Paperclip::Attachment do
                   @existing_names.each { |f| assert_file_exists(f) }
                 end
 
-                it "keeps the files when you call #delete" do
+                it "keeps the files when you call #destroy" do
                   expect(@attachment).to receive(:instance_write).with(:file_name, nil)
                   expect(@attachment).to receive(:instance_write).with(:content_type, nil)
                   expect(@attachment).to receive(:instance_write).with(:file_size, nil)
@@ -1333,7 +1359,7 @@ describe Paperclip::Attachment do
 
   context "An attachment with only a avatar_file_name column" do
     before do
-      ActiveRecord::Base.connection.create_table :dummies, force: true do |table|
+      ActiveRecord::Migration.create_table :dummies, force: true do |table|
         table.column :avatar_file_name, :string
       end
       rebuild_class
@@ -1359,7 +1385,7 @@ describe Paperclip::Attachment do
 
     context "and avatar_created_at column" do
       before do
-        ActiveRecord::Base.connection.add_column :dummies, :avatar_created_at, :timestamp
+        ActiveRecord::Migration.add_column :dummies, :avatar_created_at, :timestamp
         rebuild_class
         @dummy = Dummy.new
       end
@@ -1396,7 +1422,7 @@ describe Paperclip::Attachment do
 
     context "and avatar_updated_at column" do
       before do
-        ActiveRecord::Base.connection.add_column :dummies, :avatar_updated_at, :timestamp
+        ActiveRecord::Migration.add_column :dummies, :avatar_updated_at, :timestamp
         rebuild_class
         @dummy = Dummy.new
       end
@@ -1426,7 +1452,7 @@ describe Paperclip::Attachment do
 
     context "and avatar_content_type column" do
       before do
-        ActiveRecord::Base.connection.add_column :dummies, :avatar_content_type, :string
+        ActiveRecord::Migration.add_column :dummies, :avatar_content_type, :string
         rebuild_class
         @dummy = Dummy.new
       end
@@ -1443,7 +1469,7 @@ describe Paperclip::Attachment do
 
     context "and avatar_file_size column" do
       before do
-        ActiveRecord::Base.connection.add_column :dummies, :avatar_file_size, :bigint
+        ActiveRecord::Migration.add_column :dummies, :avatar_file_size, :bigint
         rebuild_class
         @dummy = Dummy.new
       end
@@ -1467,7 +1493,7 @@ describe Paperclip::Attachment do
 
     context "and avatar_fingerprint column" do
       before do
-        ActiveRecord::Base.connection.add_column :dummies, :avatar_fingerprint, :string
+        ActiveRecord::Migration.add_column :dummies, :avatar_fingerprint, :string
         rebuild_class
         @dummy = Dummy.new
       end
